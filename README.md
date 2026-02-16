@@ -1,27 +1,92 @@
-BlocklistBlaster (Python Edition) BlocklistBlaster is a lightweight, fast, and fully automated blocklist aggregator designed for Pi-hole, Unbound, and other DNS-based filtering systems. It downloads multiple blocklists, cleans and validates entries, removes duplicates, applies allowlists, and publishes a single curated blocklist. 
+Apophis Blocklist — Automated Daily DNS Blocklist Generator
 
-This repository automatically updates **daily** using GitHub Actions, ensuring the blocklist is always fresh. 
+This is a handsoff project.
 
-🚀 Features 
-- Merge multiple blocklists into one curated list
-- Automatic deduplication
-- Domain validation (filters out invalid entries, IPs, comments, garbage lines)
-- Allowlist support
-- Regex list support
-- Parallel downloads for speed
-- Daily automatic updates via GitHub Actions
-- Clean TOML configuration
-- Simple, readable Python code 
+Apophis Blocklist is a fast, reliable, and fully automated DNS blocklist generator designed for Pi‑hole, Unbound, AdGuard Home, and other DNS‑based filtering systems.
 
-📦 How to Use This Blocklist Pi-hole users can subscribe directly using the raw URL:
-https://raw.githubusercontent.com/asteroid-99942/apophis-blocklist/main/lists/blocklist.txt
+It aggregates multiple third‑party blocklists, cleans and validates entries, removes duplicates, applies allowlists, normalises domains, and publishes a single curated blocklist — updated **daily** via GitHub Actions.
+
+The blocklist is not adblocking but curates lists for 
+- malware
+- phishing
+- fake / scams
+
+This project is built for stability, transparency, and long‑term maintainability.
+
+
+
+🚀 Key Features
+
+✔ Daily automatic updates
+A GitHub Actions workflow regenerates the blocklist every day at 03:00 UTC and commits the results.
+
+✔ Strong domain validation
+The generator rejects:
+- malformed domains  
+- invalid TLDs  
+- domains with underscores  
+- IP addresses  
+- single‑label hostnames  
+- invalid punycode  
+
+✔ Domain normalisation
+All domains are normalised consistently:
+- lowercase  
+- IDN → punycode  
+- strip `www.`  
+- strip `*.`  
+- remove trailing slashes  
+
+✔ ETag / Last‑Modified caching
+Upstream lists are only re‑downloaded when they change.  
+This reduces bandwidth, speeds up updates, and avoids unnecessary failures.
+
+✔ Diff reporting
+Each update includes:
+- domains added  
+- domains removed  
+- total domain count  
+- full diff report in `lists/diff_report.txt`
+
+✔ Allowlist & regex support
+Allowlisted domains are removed from the final blocklist.  
+Regex entries are kept in a separate file.
+
+
+
+📦 How to Use This Blocklist
+
+Pi‑hole users can subscribe directly using the raw URL:
+https://github.com/asteroid-99942/apophis-blocklist/raw/refs/heads/main/lists/blocklist.txt
+
 Add this URL in:
 
-Pi-hole Admin → Group Management → Adlists → Add URL
+**Pi‑hole Admin → Group Management → Adlists → Add URL**
 
-Then run:
-pihole -g
+Then update gravity:
+
 
 🛠 Configuration
 
-The script uses a TOML config file
+The generator uses a TOML configuration file:
+
+Example:
+
+```toml
+[lists]
+block = [
+  "https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts",
+  ]
+
+allow = [
+  # Add allowlist URLs here
+]
+
+regex = [
+  # Add regex list URLs here
+]
+
+[output]
+block = "lists/blocklist.txt"
+allow = "lists/allowlist.txt"
+regex = "lists/regexlist.txt"
