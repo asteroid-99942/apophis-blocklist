@@ -1,10 +1,13 @@
 #!/usr/bin/env python3
 import argparse
 import concurrent.futures
+import hashlib
+import json
 import re
 import sys
 from pathlib import Path
 
+import idna
 import requests
 
 try:
@@ -13,30 +16,84 @@ except ImportError:
     import tomli as tomllib  # pip install tomli for Python <3.11
 
 
+# -----------------------------
+# CONFIG
+# -----------------------------
+
+CACHE_FILE = Path("cache/metadata.json")
+
+VALID_TLDS = {
+    # Common TLDs (you can expand this list later)
+    "com", "net", "org", "co", "uk", "io", "gov", "edu", "info", "biz",
+    "xyz", "me", "us", "ca", "de", "fr", "au", "nl", "se", "no", "fi",
+    "es", "it", "pl", "ru", "jp", "kr", "cn", "in"
+}
+
 DOMAIN_RE = re.compile(
     r"^(?=.{1,253}$)(?!-)[A-Za-z0-9-]{1,63}(?<!-)"
-    r"(?:\.(?!-)[A-Za-z0-9-]{1,63}(?<!-))*\.?$"
+    r"(?:\.(?!-)[A-Za-z0-9-]{1,63}(?<!-))*$"
 )
 
+
+# -----------------------------
+# LOGGING
+# -----------------------------
 
 def log(msg: str) -> None:
     print(msg, file=sys.stderr)
 
 
-def load_config(path: Path) -> dict:
-    if not path.is_file():
-        raise FileNotFoundError(f"Config file not found: {path}")
-    with path.open("rb") as f:
-        return tomllib.load(f)
+# -----------------------------
+# CACHE HANDLING
+# -----------------------------
+
+def load_cache() -> dict:
+    if CACHE_FILE.exists():
+        return json.loads(CACHE_FILE.read_text())
+    return {}
 
 
-def download_list(url: str, timeout: int = 15) -> list[str]:
-    log(f"[INFO] Fetching: {url}")
-    resp = requests.get(url, timeout=timeout)
-    resp.raise_for_status()
-    lines = resp.text.splitlines()
-    log(f"[INFO] Fetched {len(lines)} lines from {url}")
-    return lines
+def save_cache(cache: dict) -> None:
+    CACHE_FILE.parent.mkdir(parents=True, exist_ok=True)
+    CACHE_FILE.write_text(json.dumps(cache, indent=2))
+
+
+def hash_text(text: str) -> str:
+    return hashlib.sha256(text.encode()).hexdigest()
+
+
+# -----------------------------
+# DOMAIN NORMALISATION
+# -----------------------------
+
+def normalise_domain(domain: str) -> str | None:
+    domain = domain.strip().lower()
+
+    if domain.startswith("www."):
+        domain = domain[4:]
+
+    if domain.startswith("*."):
+        domain = domain[2:]
+
+    domain = domain.rstrip("/")
+
+    try:
+        domain = idna.encode(domain).decode()
+    except idna.IDNAError:
+        return None
+
+    return domain
+
+
+# -----------------------------
+# DOMAIN VALIDATION
+# -----------------------------
+
+def is_valid_tld(domain: str) -> bool:
+    parts = domain.split(".")
+    if len(parts) < 2:
+        return False
+    return parts[-1] in VALID_TLDS
 
 
 def is_comment_or_empty(line: str) -> bool:
@@ -45,13 +102,6 @@ def is_comment_or_empty(line: str) -> bool:
 
 
 def extract_domain(line: str) -> str | None:
-    """
-    Handle common formats:
-    - plain.domain.com
-    - 0.0.0.0 domain.com
-    - 127.0.0.1 domain.com
-    - :: domain.com
-    """
     s = line.strip()
 
     if is_comment_or_empty(s):
@@ -66,28 +116,73 @@ def extract_domain(line: str) -> str | None:
         return None
 
     parts = s.split()
-    if len(parts) == 1:
-        candidate = parts[0]
-    else:
-        # Assume first token is IP / keyword, second is domain
-        candidate = parts[1]
+    candidate = parts[0] if len(parts) == 1 else parts[1]
 
-    candidate = candidate.strip().lower().rstrip(".")
+    candidate = normalise_domain(candidate)
+    if not candidate:
+        return None
 
-    # Skip obvious IPs
+    # Reject IPs
     if re.match(r"^\d{1,3}(\.\d{1,3}){3}$", candidate):
         return None
-    if ":" in candidate:  # crude IPv6 skip
+    if ":" in candidate:
         return None
 
+    # Reject underscores
+    if "_" in candidate:
+        return None
+
+    # Validate structure
     if not DOMAIN_RE.match(candidate):
+        return None
+
+    # Validate TLD
+    if not is_valid_tld(candidate):
         return None
 
     return candidate
 
 
+# -----------------------------
+# DOWNLOADING WITH CACHING
+# -----------------------------
+
+def download_list(url: str, timeout: int = 15) -> list[str]:
+    cache = load_cache()
+    headers = {}
+
+    if url in cache:
+        if "etag" in cache[url]:
+            headers["If-None-Match"] = cache[url]["etag"]
+        if "last_modified" in cache[url]:
+            headers["If-Modified-Since"] = cache[url]["last_modified"]
+
+    resp = requests.get(url, timeout=timeout, headers=headers)
+
+    if resp.status_code == 304:
+        log(f"[INFO] Not modified: {url}")
+        return cache[url]["content"].splitlines()
+
+    resp.raise_for_status()
+    text = resp.text
+
+    cache[url] = {
+        "etag": resp.headers.get("ETag"),
+        "last_modified": resp.headers.get("Last-Modified"),
+        "hash": hash_text(text),
+        "content": text,
+    }
+    save_cache(cache)
+
+    return text.splitlines()
+
+
+# -----------------------------
+# PROCESSING
+# -----------------------------
+
 def process_lines(lines: list[str]) -> set[str]:
-    domains: set[str] = set()
+    domains = set()
     for line in lines:
         d = extract_domain(line)
         if d:
@@ -108,7 +203,7 @@ def merge_lists(urls: list[str], max_workers: int = 8) -> set[str]:
     if not urls:
         return set()
 
-    merged: set[str] = set()
+    merged = set()
     with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) as ex:
         future_map = {ex.submit(fetch_and_process, u): u for u in urls}
         for fut in concurrent.futures.as_completed(future_map):
@@ -122,14 +217,49 @@ def merge_lists(urls: list[str], max_workers: int = 8) -> set[str]:
     return merged
 
 
+# -----------------------------
+# DIFF REPORT
+# -----------------------------
+
+def load_previous_blocklist(path: Path) -> set[str]:
+    if not path.exists():
+        return set()
+    return set(path.read_text().splitlines())
+
+
+def generate_diff_report(old: set[str], new: set[str]) -> str:
+    added = new - old
+    removed = old - new
+
+    report = [
+        f"Total domains: {len(new)}",
+        f"Added: {len(added)}",
+        f"Removed: {len(removed)}",
+        "",
+        "=== Added ===",
+        *sorted(added),
+        "",
+        "=== Removed ===",
+        *sorted(removed),
+    ]
+
+    return "\n".join(report)
+
+
+# -----------------------------
+# OUTPUT
+# -----------------------------
+
 def write_list(domains: set[str], path: Path) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     sorted_domains = sorted(domains)
-    with path.open("w", encoding="utf-8") as f:
-        for d in sorted_domains:
-            f.write(d + "\n")
+    path.write_text("\n".join(sorted_domains))
     log(f"[INFO] Wrote {len(sorted_domains)} domains to {path}")
 
+
+# -----------------------------
+# MAIN
+# -----------------------------
 
 def main() -> int:
     parser = argparse.ArgumentParser(
@@ -151,7 +281,7 @@ def main() -> int:
     args = parser.parse_args()
 
     try:
-        cfg = load_config(args.config)
+        cfg = tomllib.loads(Path(args.config).read_text())
     except Exception as e:
         log(f"[ERROR] Failed to load config: {e}")
         return 1
@@ -159,9 +289,9 @@ def main() -> int:
     lists_cfg = cfg.get("lists", {})
     output_cfg = cfg.get("output", {})
 
-    block_urls = lists_cfg.get("block", []) or []
-    allow_urls = lists_cfg.get("allow", []) or []
-    regex_urls = lists_cfg.get("regex", []) or []
+    block_urls = lists_cfg.get("block", [])
+    allow_urls = lists_cfg.get("allow", [])
+    regex_urls = lists_cfg.get("regex", [])
 
     block_out = Path(output_cfg.get("block", "lists/blocklist.txt"))
     allow_out = Path(output_cfg.get("allow", "lists/allowlist.txt"))
@@ -175,27 +305,33 @@ def main() -> int:
     # Allowlist
     allow_domains = merge_lists(allow_urls, max_workers=args.max_workers)
 
-    # Remove allowed domains from blocklist
+    # Apply allowlist
     if allow_domains:
         before = len(block_domains)
         block_domains.difference_update(allow_domains)
-        log(
-            f"[INFO] Removed {before - len(block_domains)} domains from blocklist due to allowlist"
-        )
+        log(f"[INFO] Removed {before - len(block_domains)} domains due to allowlist")
 
-    # Regex list (kept raw, only basic cleaning)
-    regex_entries: set[str] = set()
-    if regex_urls:
-        for url in regex_urls:
-            try:
-                lines = download_list(url)
-                for line in lines:
-                    s = line.strip()
-                    if is_comment_or_empty(s):
-                        continue
+    # Regex list
+    regex_entries = set()
+    for url in regex_urls:
+        try:
+            lines = download_list(url)
+            for line in lines:
+                s = line.strip()
+                if not is_comment_or_empty(s):
                     regex_entries.add(s)
-            except Exception as e:
-                log(f"[WARN] Failed to fetch regex list {url}: {e}")
+        except Exception as e:
+            log(f"[WARN] Failed to fetch regex list {url}: {e}")
+
+    # Diff report
+    previous = load_previous_blocklist(block_out)
+    diff = generate_diff_report(previous, block_domains)
+    Path("lists/diff_report.txt").write_text(diff)
+
+    # Save previous for next run
+    Path("lists/blocklist_previous.txt").write_text(
+        "\n".join(sorted(block_domains))
+    )
 
     # Write outputs
     write_list(block_domains, block_out)
