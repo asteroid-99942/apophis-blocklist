@@ -1,0 +1,16 @@
+[lists]
+block = [
+  "https://urlhaus.abuse.ch/downloads/hostfile/",
+  "https://hole.cert.pl/domains/domains.txt",
+  "https://raw.githubusercontent.com/cenk/trcert-malware/main/trcert-domains.txt",
+  "https://gitlab.com/hagezi/mirror/-/raw/main/dns-blocklists/adblock/fake.txt",
+  "https://gitlab.com/hagezi/mirror/-/raw/main/dns-blocklists/adblock/tif.txt",
+  "https://raw.githubusercontent.com/FiltersHeroes/KADhosts/master/KADhosts.txt",
+  "https://raw.githubusercontent.com/stamparm/aux/master/maltrail-malware-domains.txt",
+  "https://raw.githubusercontent.com/mitchellkrogza/Phishing.Database/master/phishing-domains-ACTIVE.txt",
+  "https://threatfox.abuse.ch/downloads/hostfile",
+  "https://raw.githubusercontent.com/Zaczero/pihole-phishtank/main/hosts.txt",
+  "https://lists.cyberhost.uk/malware.txt",
+  "https://media.githubusercontent.com/media/zachlagden/Pi-hole-Optimized-Blocklists/refs/heads/main/lists/malicious.txt",
+  "https://phishing.army/download/phishing_army_blocklist.txt"
+]
