@@ -13,4 +13,11 @@ block = [
   "https://lists.cyberhost.uk/malware.txt",
   "https://media.githubusercontent.com/media/zachlagden/Pi-hole-Optimized-Blocklists/refs/heads/main/lists/malicious.txt",
   "https://phishing.army/download/phishing_army_blocklist.txt"
+  "https://malware-filter.gitlab.io/malware-filter/phishing-filter-agh.txt",
+  "https://blocklistproject.github.io/Lists/crypto.txt",
+  "https://blocklistproject.github.io/Lists/fraud.txt",
+  "https://blocklistproject.github.io/Lists/malware.txt",
+  "https://blocklistproject.github.io/Lists/phishing.txt",
+  "https://blocklistproject.github.io/Lists/ransomware.txt",
+  "https://blocklistproject.github.io/Lists/scam.txt",
 ]
