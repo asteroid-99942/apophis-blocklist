@@ -1,6 +1,4 @@
-Apophis Blocklist — Automated Daily DNS Blocklist Generator
-
-This is a handsoff project.
+Apophis Blocklist — Automated Daily DNS Blocklist Generator 
 
 Apophis Blocklist is a fast, reliable, and fully automated DNS blocklist generator designed for Pi‑hole, Unbound, AdGuard Home, and other DNS‑based filtering systems.
 
@@ -9,7 +7,9 @@ It aggregates multiple third‑party blocklists, cleans and validates entries, r
 The blocklist is not adblocking but curates lists for 
 - malware
 - phishing
-- fake / scams
+- fakes 
+- scams / fraud
+- ransomware
 
 This project is built for stability, transparency, and long‑term maintainability.
 
