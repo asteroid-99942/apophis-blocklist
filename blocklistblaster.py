@@ -27,6 +27,18 @@ VALID_TLDS = {
     "com", "net", "org", "co", "uk", "io", "gov", "edu", "info", "biz",
     "xyz", "me", "us", "ca", "de", "fr", "au", "nl", "se", "no", "fi",
     "es", "it", "pl", "ru", "jp", "kr", "cn", "in"
+
+    # High-abuse generic TLDs
+    "top", "club", "online", "site", "work", "click", "link", "live", "life", "today", "shop", "fun", "rest", "fit", "lol", "win", "men", "kim", "pro", 
+    
+    # Cheap / bulk-registered TLDs
+    "icu", "cyou", "casa", "gq", "ml", "cf", "tk", "ga", "pw", "cc", "ws", 
+    
+    # Malware / spam infrastructure TLDs 
+    "support", "help", "services", "cloud", "network", "exchange", "systems", "solutions", 
+    
+    # High-abuse ccTLDs 
+    "su", "am", "to", "la", "vg", "bz",
 }
 
 DOMAIN_RE = re.compile(
