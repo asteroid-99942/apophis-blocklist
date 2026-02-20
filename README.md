@@ -1,92 +1,76 @@
-Apophis Blocklist — Automated Daily DNS Blocklist Generator 
+Apophis Blocklist Apophis Blocklist is a fully automated, privacy‑respecting domain blocklist generator designed for Pi‑hole, Unbound, AdGuard Home, and other DNS filtering systems. It merges multiple high‑quality threat‑intelligence feeds, validates domains using the Public Suffix List (PSL), removes invalid entries, and outputs a clean, deduplicated blocklist every day. 
 
-Apophis Blocklist is a fast, reliable, and fully automated DNS blocklist generator designed for Pi‑hole, Unbound, AdGuard Home, and other DNS‑based filtering systems.
+The goal is simple: **maximum threat coverage with minimum noise**. 
 
-It aggregates multiple third‑party blocklists, cleans and validates entries, removes duplicates, applies allowlists, normalises domains, and publishes a single curated blocklist — updated **daily** via GitHub Actions.
+✨ Features 
+- **Daily automated updates** via GitHub Actions
+- **Public Suffix List (PSL) validation**
+- Rejects invalid TLDs
+- Rejects malformed domains - Ensures only real, resolvable domains are included
+- **Parallel downloading** for fast list aggregation
+- **ETag/Last‑Modified caching** to reduce bandwidth
+- **Automatic diff report** showing added/removed domains
+- **Clean, deduplicated output** suitable for Pi‑hole, Unbound, AGH, and DNS servers
+- **Configurable sources** via `blocklistblaster.toml`
 
-The blocklist is not adblocking but curates lists for 
-- malware
-- phishing
-- fakes 
-- scams / fraud
-- ransomware
+📦 Output Files 
+Generated daily into the `lists/` directory: 
+| File | Description | 
+|------|-------------|
+| `blocklist.txt` | Final merged blocklist (domains only) |
+| `allowlist.txt` | Allowlist (if configured) |
+| `regexlist.txt` | Regex rules (if configured) |
+| `diff_report.txt` | Daily diff showing added/removed domains |
+| `blocklist_previous.txt` | Snapshot used for diffing | 
 
-This project is built for stability, transparency, and long‑term maintainability.
+⚙️ How It Works 
+1. Downloads all blocklist sources defined in `blocklistblaster.toml`
+2. Normalises and validates each domain: - Removes comments, IPs, wildcards, invalid characters - Converts IDNA/Punycode - Validates TLD using the **Public Suffix List**
+3. Deduplicates and merges all domains
+4. Applies allowlist (optional)
+5. Writes final lists to `lists/`
+6. Commits changes automatically if the blocklist changed 
 
-
-
-🚀 Key Features
-
-✔ Daily automatic updates
-A GitHub Actions workflow regenerates the blocklist every day at 03:00 UTC and commits the results.
-
-✔ Strong domain validation
-The generator rejects:
-- malformed domains  
-- invalid TLDs  
-- domains with underscores  
-- IP addresses  
-- single‑label hostnames  
-- invalid punycode  
-
-✔ Domain normalisation
-All domains are normalised consistently:
-- lowercase  
-- IDN → punycode  
-- strip `www.`  
-- strip `*.`  
-- remove trailing slashes  
-
-✔ ETag / Last‑Modified caching
-Upstream lists are only re‑downloaded when they change.  
-This reduces bandwidth, speeds up updates, and avoids unnecessary failures.
-
-✔ Diff reporting
-Each update includes:
-- domains added  
-- domains removed  
-- total domain count  
-- full diff report in `lists/diff_report.txt`
-
-✔ Allowlist & regex support
-Allowlisted domains are removed from the final blocklist.  
-Regex entries are kept in a separate file.
-
-
-
-📦 How to Use This Blocklist
-
-Pi‑hole users can subscribe directly using the raw URL:
-https://github.com/asteroid-99942/apophis-blocklist/raw/refs/heads/main/lists/blocklist.txt
-
-Add this URL in:
-
-**Pi‑hole Admin → Group Management → Adlists → Add URL**
-
-Then update gravity:
-
-
-🛠 Configuration
-
-The generator uses a TOML configuration file:
+🛠 Configuration All sources are defined in:
+blocklistblaster.toml
 
 Example:
 
 ```toml
 [lists]
 block = [
-  "https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts",
-  ]
-
-allow = [
-  # Add allowlist URLs here
+  "https://example.com/malware.txt",
+  "https://example.com/phishing.txt"
 ]
 
-regex = [
-  # Add regex list URLs here
-]
+allow = []
+regex = []
 
 [output]
 block = "lists/blocklist.txt"
 allow = "lists/allowlist.txt"
 regex = "lists/regexlist.txt"
+```
+
+
+🔄 Automation
+.github/workflows/update-blocklist.yml
+
+Runs daily at 03:00 UTC and:
+
+- Installs dependencies
+- Runs the blocklist generator
+- Commits updated lists if changes are detected
+
+🛡 Philosophy
+This project prioritises:
+
+Accuracy — only real domains with valid public suffixes
+
+Coverage — multiple independent threat feeds
+
+Stability — no ABP/Adblock syntax, no noise, no junk
+
+Transparency — daily diff reports
+
+Privacy — no external analytics, no telemetry
