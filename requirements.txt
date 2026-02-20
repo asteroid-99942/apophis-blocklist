@@ -1,0 +1,4 @@
+requests
+idna
+tomli
+publicsuffix2
