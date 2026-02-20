@@ -9,6 +9,7 @@ from pathlib import Path
 
 import idna
 import requests
+from publicsuffix2 import PublicSuffixList
 
 try:
     import tomllib  # Python 3.11+
@@ -22,29 +23,14 @@ except ImportError:
 
 CACHE_FILE = Path("cache/metadata.json")
 
-VALID_TLDS = {
-    # Common TLDs (you can expand this list later)
-    "com", "net", "org", "co", "uk", "io", "gov", "edu", "info", "biz",
-    "xyz", "me", "us", "ca", "de", "fr", "au", "nl", "se", "no", "fi",
-    "es", "it", "pl", "ru", "jp", "kr", "cn", "in"
-
-    # High-abuse generic TLDs
-    "top", "club", "online", "site", "work", "click", "link", "live", "life", "today", "shop", "fun", "rest", "fit", "lol", "win", "men", "kim", "pro", 
-    
-    # Cheap / bulk-registered TLDs
-    "icu", "cyou", "casa", "gq", "ml", "cf", "tk", "ga", "pw", "cc", "ws", 
-    
-    # Malware / spam infrastructure TLDs 
-    "support", "help", "services", "cloud", "network", "exchange", "systems", "solutions", 
-    
-    # High-abuse ccTLDs 
-    "su", "am", "to", "la", "vg", "bz",
-}
-
 DOMAIN_RE = re.compile(
     r"^(?=.{1,253}$)(?!-)[A-Za-z0-9-]{1,63}(?<!-)"
     r"(?:\.(?!-)[A-Za-z0-9-]{1,63}(?<!-))*$"
 )
+
+# Load Public Suffix List (vendored)
+PSL_PATH = Path("data/public_suffix_list.dat")
+psl = PublicSuffixList(PSL_PATH.read_text().splitlines())
 
 
 # -----------------------------
@@ -98,15 +84,28 @@ def normalise_domain(domain: str) -> str | None:
 
 
 # -----------------------------
-# DOMAIN VALIDATION
+# PSL-BASED TLD VALIDATION
 # -----------------------------
 
 def is_valid_tld(domain: str) -> bool:
-    parts = domain.split(".")
-    if len(parts) < 2:
-        return False
-    return parts[-1] in VALID_TLDS
+    """
+    Validate domain using the Public Suffix List.
+    Returns True if the domain has a recognised public suffix.
+    """
+    suffix = psl.get_public_suffix(domain)
 
+    # If PSL returns the domain itself, it's not a valid public suffix
+    # Example: "localhost" -> suffix == "localhost"
+    if suffix == domain:
+        return False
+
+    # Must contain at least one dot (e.g., "example.com")
+    return "." in suffix
+
+
+# -----------------------------
+# DOMAIN EXTRACTION
+# -----------------------------
 
 def is_comment_or_empty(line: str) -> bool:
     s = line.strip()
@@ -148,7 +147,7 @@ def extract_domain(line: str) -> str | None:
     if not DOMAIN_RE.match(candidate):
         return None
 
-    # Validate TLD
+    # Validate TLD using PSL
     if not is_valid_tld(candidate):
         return None
 
@@ -358,3 +357,4 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+
