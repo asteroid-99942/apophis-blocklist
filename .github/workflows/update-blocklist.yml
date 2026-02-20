@@ -22,7 +22,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install requests tomli
+          pip install requests tomli publicsuffix2
 
       - name: Run BlocklistBlaster
         run: |
