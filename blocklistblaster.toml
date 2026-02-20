@@ -19,4 +19,12 @@ block = [
   "https://blocklistproject.github.io/Lists/phishing.txt",
   "https://blocklistproject.github.io/Lists/ransomware.txt",
   "https://blocklistproject.github.io/Lists/scam.txt",
+  "https://feodotracker.abuse.ch/downloads/domains.txt",
+  "https://sslbl.abuse.ch/blacklist/sslipblacklist.txt",
+  "https://openphish.com/feed.txt",
+  "https://mirror1.malwaredomains.com/files/domains.txt",
+  "https://raw.githubusercontent.com/quad9dns/blocklist/main/quad9-blocklist.txt",
+  "https://raw.githubusercontent.com/firehol/blocklist-ipsets/master/firehol_level1.netset",
+  "https://raw.githubusercontent.com/firehol/blocklist-ipsets/master/firehol_level2.netset",
+  "https://raw.githubusercontent.com/firehol/blocklist-ipsets/master/firehol_level3.netset",
 ]
