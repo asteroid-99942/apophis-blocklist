@@ -12,7 +12,7 @@ block = [
   "https://raw.githubusercontent.com/Zaczero/pihole-phishtank/main/hosts.txt",
   "https://lists.cyberhost.uk/malware.txt",
   "https://media.githubusercontent.com/media/zachlagden/Pi-hole-Optimized-Blocklists/refs/heads/main/lists/malicious.txt",
-  "https://phishing.army/download/phishing_army_blocklist.txt"
+  "https://phishing.army/download/phishing_army_blocklist.txt",
   "https://malware-filter.gitlab.io/malware-filter/phishing-filter-agh.txt",
   "https://blocklistproject.github.io/Lists/crypto.txt",
   "https://blocklistproject.github.io/Lists/fraud.txt",
