@@ -3,8 +3,6 @@ block = [
   "https://urlhaus.abuse.ch/downloads/hostfile/",
   "https://hole.cert.pl/domains/domains.txt",
   "https://raw.githubusercontent.com/cenk/trcert-malware/main/trcert-domains.txt",
-  "https://cdn.jsdelivr.net/gh/hagezi/dns-blocklists@latest/dns/fake.txt",
-  "https://cdn.jsdelivr.net/gh/hagezi/dns-blocklists@latest/dns/tif.txt",
   "https://raw.githubusercontent.com/FiltersHeroes/KADhosts/master/KADhosts.txt",
   "https://raw.githubusercontent.com/stamparm/aux/master/maltrail-malware-domains.txt",
   "https://raw.githubusercontent.com/mitchellkrogza/Phishing.Database/master/phishing-domains-ACTIVE.txt",
@@ -19,12 +17,7 @@ block = [
   "https://blocklistproject.github.io/Lists/phishing.txt",
   "https://blocklistproject.github.io/Lists/ransomware.txt",
   "https://blocklistproject.github.io/Lists/scam.txt",
-  "https://feodotracker.abuse.ch/downloads/domains.txt",
   "https://sslbl.abuse.ch/blacklist/sslipblacklist.txt",
   "https://openphish.com/feed.txt",
-  "https://mirror1.malwaredomains.com/files/domains.txt",
-  "https://raw.githubusercontent.com/quad9dns/blocklist/main/quad9-blocklist.txt",
-  "https://raw.githubusercontent.com/firehol/blocklist-ipsets/master/firehol_level1.netset",
-  "https://raw.githubusercontent.com/firehol/blocklist-ipsets/master/firehol_level2.netset",
-  "https://raw.githubusercontent.com/firehol/blocklist-ipsets/master/firehol_level3.netset",
-]
+  "https://raw.githubusercontent.com/FiltersHeroes/KADhosts/master/KADhosts.txt
+  ]
