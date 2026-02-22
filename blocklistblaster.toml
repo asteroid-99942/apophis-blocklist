@@ -19,5 +19,5 @@ block = [
   "https://blocklistproject.github.io/Lists/scam.txt",
   "https://sslbl.abuse.ch/blacklist/sslipblacklist.txt",
   "https://openphish.com/feed.txt",
-  "https://raw.githubusercontent.com/FiltersHeroes/KADhosts/master/KADhosts.txt
+  "https://raw.githubusercontent.com/FiltersHeroes/KADhosts/master/KADhosts.txt",
   ]
