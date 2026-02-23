@@ -7,7 +7,7 @@ block = [
   "https://raw.githubusercontent.com/stamparm/aux/master/maltrail-malware-domains.txt",
   "https://raw.githubusercontent.com/mitchellkrogza/Phishing.Database/master/phishing-domains-ACTIVE.txt",
   "https://raw.githubusercontent.com/phishdestroy/destroylist/refs/heads/main/list.txt",
-  "https://raw.githubusercontent.com/durablenapkin/scamblocklist/master/hosts.txt"),
+  "https://raw.githubusercontent.com/durablenapkin/scamblocklist/master/hosts.txt",
   "https://threatfox.abuse.ch/downloads/hostfile",
   "https://raw.githubusercontent.com/Zaczero/pihole-phishtank/main/hosts.txt",
   "https://lists.cyberhost.uk/malware.txt",
