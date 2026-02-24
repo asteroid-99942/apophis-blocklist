@@ -1,4 +1,7 @@
-Apophis Blocklist Apophis Blocklist is a fully automated, privacy‑respecting domain blocklist generator designed for Pi‑hole, Unbound, AdGuard Home, and other DNS filtering systems. It merges multiple high‑quality threat‑intelligence feeds, validates domains using the Public Suffix List (PSL), removes invalid entries, and outputs a clean, deduplicated blocklist every day. 
+Apophis Blocklist is a fully automated, privacy‑respecting domain blocklist generator designed for Pi‑hole, Unbound, AdGuard Home, and other DNS filtering systems. It merges multiple high‑quality threat‑intelligence feeds, validates domains using the Public Suffix List (PSL), removes invalid entries, and outputs a clean, deduplicated blocklist every day. 
+
+Apophis uses a curated selection of third‑party blocklists focused exclusively on malware, ransomware, phishing, scams, fraud, and other security‑critical threats. It does not target advertising, tracking, or general content blocking, although some third party lists may incorporate blocking of ad / tracking services they deem to be excessive. Users are responsible for reviewing the included sources, maintaining their own allowlists, and ensuring the blocklist fits their environment and risk tolerance.
+ 
 
 The goal is simple: **maximum threat coverage with minimum noise**. 
 
