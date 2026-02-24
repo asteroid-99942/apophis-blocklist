@@ -126,6 +126,32 @@ def extract_domain(line: str) -> str | None:
     if not s:
         return None
 
+# -----------------------------------------
+    # NEW FORMAT 1: Full URLs (OpenPhish) 
+# -----------------------------------------
+    if s.startswith("http://") or s.startswith("https://"): 
+        try: 
+            parsed = urllib.parse.urlparse(s) 
+            if parsed.hostname: 
+                s = parsed.hostname.lower() 
+            else: 
+                return None 
+        except Exception: 
+            return None
+            
+# ----------------------------------------- 
+# NEW FORMAT 2: Hosts-style "0.0.0.0 domain"
+# -----------------------------------------
+    elif s.startswith("0.0.0.0 "): 
+        parts = s.split() 
+        if len(parts) >= 2:
+            s = parts[1].strip().lower()
+        else: 
+            return None
+
+# ----------------------------------------- 
+# EXISTING LOGIC (unchanged) 
+# -----------------------------------------
     parts = s.split()
     candidate = parts[0] if len(parts) == 1 else parts[1]
 
