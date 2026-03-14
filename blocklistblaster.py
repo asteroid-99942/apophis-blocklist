@@ -3,8 +3,11 @@ import argparse
 import concurrent.futures
 import hashlib
 import json
+import random
 import re
 import sys
+import time
+import urllib.parse
 from pathlib import Path
 
 import idna
@@ -28,7 +31,6 @@ DOMAIN_RE = re.compile(
     r"(?:\.(?!-)[A-Za-z0-9-]{1,63}(?<!-))*$"
 )
 
-# Load Public Suffix List (vendored)
 PSL_PATH = Path("data/public_suffix_list.dat")
 psl = PublicSuffixList(PSL_PATH.read_text().splitlines())
 
@@ -88,18 +90,9 @@ def normalise_domain(domain: str) -> str | None:
 # -----------------------------
 
 def is_valid_tld(domain: str) -> bool:
-    """
-    Validate domain using the Public Suffix List.
-    Returns True if the domain has a recognised public suffix.
-    """
     suffix = psl.get_public_suffix(domain)
-
-    # If PSL returns the domain itself, it's not a valid public suffix
-    # Example: "localhost" -> suffix == "localhost"
     if suffix == domain:
         return False
-
-    # Must contain at least one dot (e.g., "example.com")
     return "." in suffix
 
 
@@ -126,32 +119,26 @@ def extract_domain(line: str) -> str | None:
     if not s:
         return None
 
-# -----------------------------------------
-    # NEW FORMAT 1: Full URLs (OpenPhish) 
-# -----------------------------------------
-    if s.startswith("http://") or s.startswith("https://"): 
-        try: 
-            parsed = urllib.parse.urlparse(s) 
-            if parsed.hostname: 
-                s = parsed.hostname.lower() 
-            else: 
-                return None 
-        except Exception: 
-            return None
-            
-# ----------------------------------------- 
-# NEW FORMAT 2: Hosts-style "0.0.0.0 domain"
-# -----------------------------------------
-    elif s.startswith("0.0.0.0 "): 
-        parts = s.split() 
-        if len(parts) >= 2:
-            s = parts[1].strip().lower()
-        else: 
+    # NEW FORMAT 1: Full URLs
+    if s.startswith("http://") or s.startswith("https://"):
+        try:
+            parsed = urllib.parse.urlparse(s)
+            if parsed.hostname:
+                s = parsed.hostname.lower()
+            else:
+                return None
+        except Exception:
             return None
 
-# ----------------------------------------- 
-# EXISTING LOGIC (unchanged) 
-# -----------------------------------------
+    # NEW FORMAT 2: Hosts-style "0.0.0.0 domain"
+    elif s.startswith("0.0.0.0 "):
+        parts = s.split()
+        if len(parts) >= 2:
+            s = parts[1].strip().lower()
+        else:
+            return None
+
+    # Existing logic
     parts = s.split()
     candidate = parts[0] if len(parts) == 1 else parts[1]
 
@@ -173,7 +160,7 @@ def extract_domain(line: str) -> str | None:
     if not DOMAIN_RE.match(candidate):
         return None
 
-    # Validate TLD using PSL
+    # Validate TLD
     if not is_valid_tld(candidate):
         return None
 
@@ -181,37 +168,78 @@ def extract_domain(line: str) -> str | None:
 
 
 # -----------------------------
-# DOWNLOADING WITH CACHING
+# RESILIENT DOWNLOADING
 # -----------------------------
 
-def download_list(url: str, timeout: int = 15) -> list[str]:
+def download_list(url: str, timeout: int = 15, max_retries: int = 5) -> list[str]:
     cache = load_cache()
-    headers = {}
 
-    if url in cache:
-        if "etag" in cache[url]:
-            headers["If-None-Match"] = cache[url]["etag"]
-        if "last_modified" in cache[url]:
-            headers["If-Modified-Since"] = cache[url]["last_modified"]
+    def has_cached() -> bool:
+        return url in cache and "content" in cache[url]
 
-    resp = requests.get(url, timeout=timeout, headers=headers)
-
-    if resp.status_code == 304:
-        log(f"[INFO] Not modified: {url}")
+    def cached_lines() -> list[str]:
         return cache[url]["content"].splitlines()
 
-    resp.raise_for_status()
-    text = resp.text
+    backoff_base = 1.0
 
-    cache[url] = {
-        "etag": resp.headers.get("ETag"),
-        "last_modified": resp.headers.get("Last-Modified"),
-        "hash": hash_text(text),
-        "content": text,
-    }
-    save_cache(cache)
+    for attempt in range(1, max_retries + 1):
+        headers = {}
 
-    return text.splitlines()
+        if url in cache:
+            if "etag" in cache[url]:
+                headers["If-None-Match"] = cache[url]["etag"]
+            if "last_modified" in cache[url]:
+                headers["If-Modified-Since"] = cache[url]["last_modified"]
+
+        try:
+            resp = requests.get(url, timeout=timeout, headers=headers)
+
+            if resp.status_code == 304 and has_cached():
+                log(f"[INFO] Not modified (304): {url}")
+                return cached_lines()
+
+            resp.raise_for_status()
+            text = resp.text
+
+            # Validate content
+            stripped = text.strip()
+            if not stripped:
+                raise ValueError("empty response body")
+
+            lower = stripped.lower()
+            if "<html" in lower or lower.startswith("<!doctype html"):
+                raise ValueError("HTML error page")
+            if lower.startswith("{") or lower.startswith("["):
+                raise ValueError("JSON error page")
+
+            # Save good content
+            cache[url] = {
+                "etag": resp.headers.get("ETag"),
+                "last_modified": resp.headers.get("Last-Modified"),
+                "hash": hash_text(text),
+                "content": text,
+            }
+            save_cache(cache)
+
+            return text.splitlines()
+
+        except Exception as e:
+            log(f"[WARN] Attempt {attempt}/{max_retries} failed for {url}: {e}")
+
+            if attempt < max_retries:
+                delay = backoff_base * (2 ** (attempt - 1))
+                delay += random.uniform(0, delay * 0.5)
+                log(f"[INFO] Backing off {delay:.2f}s before retrying {url}")
+                time.sleep(delay)
+            else:
+                log(f"[ERROR] Exhausted retries for {url}")
+
+    # All attempts failed
+    if has_cached():
+        log(f"[WARN] Using cached content for {url} after repeated failures")
+        return cached_lines()
+
+    raise RuntimeError(f"Failed to download {url} and no cached content is available")
 
 
 # -----------------------------
@@ -383,4 +411,3 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
-
