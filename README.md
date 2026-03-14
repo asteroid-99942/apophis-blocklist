@@ -1,5 +1,6 @@
 
 📛 Apophis Blocklist — Resilient, Curated, Daily‑Updated Threat Intelligence <br>
+<br>
 Apophis Blocklist is a high‑quality, aggressively curated domain blocklist designed for Pi‑hole, Unbound, AdGuard Home, and other DNS‑based filtering systems.
 
 It aggregates multiple reputable threat‑intelligence feeds, normalises and validates domains, removes false positives, and produces a clean, deduplicated blocklist updated automatically every day.
