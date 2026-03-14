@@ -2,8 +2,8 @@ name: Update Blocklist Daily
 
 on:
   schedule:
-    - cron: "0 3 * * *"   # Runs daily at 03:00 UTC
-  workflow_dispatch:       # Allows manual runs
+    - cron: "0 3 * * *"
+  workflow_dispatch:
 
 jobs:
   build:
@@ -15,6 +15,14 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Restore cache (metadata.json + previous lists)
+        uses: actions/cache@v4
+        with:
+          path: |
+            cache
+            lists/blocklist_previous.txt
+          key: blocklist-cache
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
@@ -22,7 +30,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install requests tomli publicsuffix2
+          pip install requests tomli publicsuffix2 idna
 
       - name: Run BlocklistBlaster
         run: |
