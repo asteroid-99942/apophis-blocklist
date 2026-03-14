@@ -1,5 +1,5 @@
 
-📛 Apophis Blocklist — Resilient, Curated, Daily‑Updated Threat Intelligence
+📛 Apophis Blocklist — Resilient, Curated, Daily‑Updated Threat Intelligence <br>
 Apophis Blocklist is a high‑quality, aggressively curated domain blocklist designed for Pi‑hole, Unbound, AdGuard Home, and other DNS‑based filtering systems.
 
 It aggregates multiple reputable threat‑intelligence feeds, normalises and validates domains, removes false positives, and produces a clean, deduplicated blocklist updated automatically every day.
@@ -10,7 +10,7 @@ While the focus is malware, scams / fraud and phishing third party blocklists ma
 
 <br>
 
-✨ Key Features
+✨ Key Features<br>
 ✔ Resilient Fetching
 Each source list is downloaded with:
 
@@ -21,7 +21,7 @@ Each source list is downloaded with:
 
 This prevents upstream failures (e.g., TR‑CERT empty responses) from poisoning the blocklist.
 <br>
-
+<br>
 ✔ Domain Normalisation & Validation
 Every entry is processed through:
 
@@ -33,7 +33,7 @@ Every entry is processed through:
 - Removal of IPs, invalid TLDs, and malformed entries
 <br>
 
-✔ Intelligent Caching
+✔ Intelligent Caching <br>
 The updater stores:
 
 - ETag / Last‑Modified headers
@@ -41,13 +41,15 @@ The updater stores:
 - Previous blocklist snapshot
 <br>
 This enables:
-- Conditional GETs (faster, lighter updates)
-- Safe fallback when a source misbehaves
+<br>
+- Conditional GETs (faster, lighter updates) <br>
+- Safe fallback when a source misbehaves <br>
 - Accurate diff reports
-
+<br>
 <br>
 ✔ Parallel Processing
 All lists are fetched and processed concurrently for speed.
+<br>
 <br>
 ✔ Allowlist & Regex Support
 The updater supports:
