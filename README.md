@@ -1,49 +1,112 @@
-Apophis Blocklist is a fully automated, privacy‑respecting domain blocklist generator designed for Pi‑hole, Unbound, AdGuard Home, and other DNS filtering systems. It merges multiple high‑quality threat‑intelligence feeds, validates domains using the Public Suffix List (PSL), removes invalid entries, and outputs a clean, deduplicated blocklist every day. 
 
-Apophis uses a curated selection of third‑party blocklists focused exclusively on malware, ransomware, phishing, scams, fraud, and other security‑critical threats. It does not target advertising, tracking, or general content blocking, although some third party lists may incorporate blocking of ad / tracking services they deem to be excessive. Users are responsible for reviewing the included sources, maintaining their own allowlists, and ensuring the blocklist fits their environment and risk tolerance.
- 
+📛 Apophis Blocklist — Resilient, Curated, Daily‑Updated Threat Intelligence
+Apophis Blocklist is a high‑quality, aggressively curated domain blocklist designed for Pi‑hole, Unbound, AdGuard Home, and other DNS‑based filtering systems.
 
-The goal is simple: **maximum threat coverage with minimum noise**. 
+It aggregates multiple reputable threat‑intelligence feeds, normalises and validates domains, removes false positives, and produces a clean, deduplicated blocklist updated automatically every day.
 
-✨ Features 
-- **Daily automated updates** via GitHub Actions
-- **Public Suffix List (PSL) validation**
-- Rejects invalid TLDs
-- Rejects malformed domains - Ensures only real, resolvable domains are included
-- **Parallel downloading** for fast list aggregation
-- **ETag/Last‑Modified caching** to reduce bandwidth
-- **Automatic diff report** showing added/removed domains
-- **Clean, deduplicated output** suitable for Pi‑hole, Unbound, AGH, and DNS servers
-- **Configurable sources** via `blocklistblaster.toml`
+This project is engineered for reliability, safety, and zero‑regression behaviour — meaning the blocklist will never shrink due to upstream outages or malformed feeds.
 
-📦 Output Files 
-Generated daily into the `lists/` directory: 
-| File | Description | 
-|------|-------------|
-| `blocklist.txt` | Final merged blocklist (domains only) |
-| `allowlist.txt` | Allowlist (if configured) |
-| `regexlist.txt` | Regex rules (if configured) |
-| `diff_report.txt` | Daily diff showing added/removed domains |
-| `blocklist_previous.txt` | Snapshot used for diffing | 
+While the focus is malware, scams / fraud and phishing third party blocklists may also incorporate advertising which have been previously abused to deliver malware or legitamate services that use computing resources which maybe hijacked to run without a users knowledge. There may also be instances of advertising blocking where a list manager feels the platform is over intrusive on a users privacy. 
 
-⚙️ How It Works 
-1. Downloads all blocklist sources defined in `blocklistblaster.toml`
-2. Normalises and validates each domain: - Removes comments, IPs, wildcards, invalid characters - Converts IDNA/Punycode - Validates TLD using the **Public Suffix List**
-3. Deduplicates and merges all domains
-4. Applies allowlist (optional)
-5. Writes final lists to `lists/`
-6. Commits changes automatically if the blocklist changed 
+<br>
 
-🛠 Configuration All sources are defined in:
-blocklistblaster.toml
+✨ Key Features
+✔ Resilient Fetching
+Each source list is downloaded with:
 
-Example:
+- Retry logic
+- Exponential backoff + jitter
+- Content validation (rejects empty/HTML/JSON/error pages)
+- Automatic fallback to last‑known‑good cached content
 
-```toml
+This prevents upstream failures (e.g., TR‑CERT empty responses) from poisoning the blocklist.
+<br>
+
+✔ Domain Normalisation & Validation
+Every entry is processed through:
+
+- IDNA conversion
+- Public Suffix List (PSL) validation
+- Hostfile parsing (0.0.0.0 domain)
+- URL parsing (OpenPhish, URLHaus, etc.)
+- Strict domain regex validation
+- Removal of IPs, invalid TLDs, and malformed entries
+<br>
+
+✔ Intelligent Caching
+The updater stores:
+
+- ETag / Last‑Modified headers
+- Last‑known‑good content
+- Previous blocklist snapshot
+<br>
+This enables:
+- Conditional GETs (faster, lighter updates)
+- Safe fallback when a source misbehaves
+- Accurate diff reports
+
+<br>
+✔ Parallel Processing
+All lists are fetched and processed concurrently for speed.
+<br>
+✔ Allowlist & Regex Support
+The updater supports:
+
+- allow lists (remove domains from blocklist)
+- regex lists (for Pi‑hole regex filtering)
+
+<br>
+✔ Daily Automated Updates
+A GitHub Actions workflow:
+
+- Restores cache
+- Runs the updater
+- Generates diff reports
+- Commits only when changes exist
+<br>
+
+✔ Easy List Management
+- Configurable sources via `blocklistblaster.toml`
+  
+<br>
+📁 Repository Structure
+<br>
+.<br>
+├── blocklistblaster.py        # Main updater script (resilient version)
+
+├── blocklistblaster.toml      # Configuration file
+
+├── cache/                     # ETag + content cache (persisted via Actions)
+
+├── data/public_suffix_list.dat
+
+├── lists/
+
+│   ├── blocklist.txt          # Final merged blocklist
+
+│   ├── allowlist.txt          # Allowlist output (if used)
+
+│   ├── regexlist.txt          # Regex output (if used)
+
+│   ├── blocklist_previous.txt # Snapshot for diffing
+
+│   └── diff_report.txt        # Daily diff report
+
+└── .github/workflows/update.yml
+
+
+<br>
+<br>
+
+⚙ Configuration (blocklistblaster.toml)
+
+```
 [lists]
 block = [
-  "https://example.com/malware.txt",
-  "https://example.com/phishing.txt"
+  "https://blocklistproject.github.io/Lists/malware.txt",
+  "https://openphish.com/feed.txt",
+  "https://raw.githubusercontent.com/cenk/trcert-malware/main/trcert-domains.txt",
+  ...
 ]
 
 allow = []
@@ -55,25 +118,35 @@ allow = "lists/allowlist.txt"
 regex = "lists/regexlist.txt"
 ```
 
+<br>
+🚀 Running Locally
 
-🔄 Automation
-.github/workflows/update-blocklist.yml
+```
+pip install requests publicsuffix2 idna tomli
+python3 blocklistblaster.py -c blocklistblaster.toml
+```
+<br>
 
-Runs daily at 03:00 UTC and:
+🤖 GitHub Actions Automation
+The workflow:
 
-- Installs dependencies
-- Runs the blocklist generator
-- Commits updated lists if changes are detected
+-Restores cache
+- Runs the updater
+- Saves updated cache
+- Commits only if blocklist changed
 
-🛡 Philosophy
-This project prioritises:
+This ensures stable, predictable daily updates.
 
-Accuracy — only real domains with valid public suffixes
+<br>
+🛡 Reliability Guarantees 
+<br>
+Apophis Blocklist is designed so that:
 
-Coverage — multiple independent threat feeds
+- No upstream outage can shrink the blocklist
+- No malformed feed can overwrite good data
+- No empty or HTML/JSON error page is ever accepted
+- Every domain is validated against the Public Suffix List
+- Every update is diffed against the previous version
 
-Stability — no ABP/Adblock syntax, no noise, no junk
+This makes it suitable for production Pi‑hole/Unbound deployments where stability matters.
 
-Transparency — daily diff reports
-
-Privacy — no external analytics, no telemetry
