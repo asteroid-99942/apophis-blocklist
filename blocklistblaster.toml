@@ -1,59 +1,162 @@
+# ============================================
+# MALWARE
+# ============================================
 [lists]
 block = [
-  "https://blocklistproject.github.io/Lists/crypto.txt",
-  "https://blocklistproject.github.io/Lists/fraud.txt",
+  # BlocklistProject – Malware
   "https://blocklistproject.github.io/Lists/malware.txt",
-  "https://blocklistproject.github.io/Lists/phishing.txt",
-  "https://blocklistproject.github.io/Lists/ransomware.txt",
-  "https://blocklistproject.github.io/Lists/scam.txt",
-  "https://hole.cert.pl/domains/domains.txt",
+  "https://blocklist.sefinek.net/generated/v1/0.0.0.0/malicious/blocklistproject/malware.fork.txt",
+
+  # DandelionSprout Anti-Malware
+  "https://blocklist.sefinek.net/generated/v1/0.0.0.0/malicious/DandelionSprout-AntiMalwareHosts.fork.txt",
+
+  # Disconnect.me Malvertising
+  "https://blocklist.sefinek.net/generated/v1/0.0.0.0/malicious/disconnectme/simple-malvertising.fork.txt",
+
+  # HostsVN (bigdargon)
+  "https://blocklist.sefinek.net/generated/v1/0.0.0.0/malicious/bigdargon/hostsVN.fork.txt",
+
+  # KADhosts
+  "https://raw.githubusercontent.com/FiltersHeroes/KADhosts/master/KADhosts.txt",
+
+  # Malware-Filter / URLHaus
+  "https://blocklist.sefinek.net/generated/v1/0.0.0.0/malicious/malware-filter/urlhaus-filter-hosts-online.fork.txt",
+
+  # NoTrack Malware
+  "https://blocklist.sefinek.net/generated/v1/0.0.0.0/malicious/quidsup/notrack-malware.fork.txt",
+
+  # Norton-reported
+  "https://blocklist.sefinek.net/generated/v1/0.0.0.0/malicious/reported-by-norton.txt",
+
+  # RPiList Malware
+  "https://blocklist.sefinek.net/generated/v1/0.0.0.0/malicious/RPiList/Malware.fork.txt",
+
+  # Sefinek Malware
+  "https://blocklist.sefinek.net/generated/v1/0.0.0.0/malicious/sefinek.hosts.txt",
+
+  # Spam404 Malware
+  "https://blocklist.sefinek.net/generated/v1/0.0.0.0/malicious/Spam404/main-blacklist.fork.txt",
+
+  # Stamparm Maltrail
+  "https://raw.githubusercontent.com/stamparm/aux/master/maltrail-malware-domains.txt",
+
+  # ThreatFox
+  "https://threatfox.abuse.ch/downloads/hostfile",
+
+  # TR-CERT Malware
+  "https://raw.githubusercontent.com/cenk/trcert-malware/main/trcert-domains.txt",
+
+  # URLHaus (Abuse.ch)
+  "https://urlhaus.abuse.ch/downloads/hostfile/",
+
+  # Misc
   "https://lists.cyberhost.uk/malware.txt",
   "https://media.githubusercontent.com/media/zachlagden/Pi-hole-Optimized-Blocklists/refs/heads/main/lists/malicious.txt",
-  "https://phishing.army/download/phishing_army_blocklist.txt",
-  "https://raw.githubusercontent.com/cenk/trcert-malware/main/trcert-domains.txt",
-  "https://raw.githubusercontent.com/durablenapkin/scamblocklist/master/hosts.txt",
-  "https://raw.githubusercontent.com/FiltersHeroes/KADhosts/master/KADhosts.txt",
-  "https://raw.githubusercontent.com/mitchellkrogza/Phishing.Database/master/phishing-domains-ACTIVE.txt",
-  "https://raw.githubusercontent.com/openphish/public_feed/refs/heads/main/feed.txt",
-  "https://raw.githubusercontent.com/phishdestroy/destroylist/refs/heads/main/list.txt",
-  "https://raw.githubusercontent.com/stamparm/aux/master/maltrail-malware-domains.txt",
-  "https://raw.githubusercontent.com/Zaczero/pihole-phishtank/main/hosts.txt",
-  "https://threatfox.abuse.ch/downloads/hostfile",
-  "https://urlhaus.abuse.ch/downloads/hostfile/",
-  "https://blocklist.sefinek.net/generated/v1/0.0.0.0/test.txt",
-  "https://blocklist.sefinek.net/generated/v1/0.0.0.0/malicious/AssoEchap/stalkerware-indicators.fork.txt",
-  "https://blocklist.sefinek.net/generated/v1/0.0.0.0/malicious/bigdargon/hostsVN.fork.txt",
-  "https://blocklist.sefinek.net/generated/v1/0.0.0.0/malicious/blocklistproject/malware.fork.txt",
-  "https://blocklist.sefinek.net/generated/v1/0.0.0.0/malicious/DandelionSprout-AntiMalwareHosts.fork.txt",
-  "https://blocklist.sefinek.net/generated/v1/0.0.0.0/malicious/disconnectme/simple-malvertising.fork.txt",
-  "https://blocklist.sefinek.net/generated/v1/0.0.0.0/malicious/malware-filter/urlhaus-filter-hosts-online.fork.txt",
-  "https://blocklist.sefinek.net/generated/v1/0.0.0.0/malicious/quidsup/notrack-malware.fork.txt",
-  "https://blocklist.sefinek.net/generated/v1/0.0.0.0/malicious/reported-by-norton.txt",
-  "https://blocklist.sefinek.net/generated/v1/0.0.0.0/malicious/RPiList/Malware.fork.txt",
-  "https://blocklist.sefinek.net/generated/v1/0.0.0.0/malicious/sefinek.hosts.txt",
-  "https://blocklist.sefinek.net/generated/v1/0.0.0.0/malicious/Spam404/main-blacklist.fork.txt",
-  "https://blocklist.sefinek.net/generated/v1/0.0.0.0/malicious/web-attacks.txt",
-  "https://blocklist.sefinek.net/generated/v1/0.0.0.0/malicious/phishing.txt",
+  "https://hole.cert.pl/domains/domains.txt",
+
+# ============================================
+# PHISHING
+# ============================================
+# BlocklistProject – Phishing
+  "https://blocklistproject.github.io/Lists/phishing.txt",
   "https://blocklist.sefinek.net/generated/v1/0.0.0.0/phishing/blocklistproject/phishing.fork.txt",
+
+  # Dogino Discord Phishing
   "https://blocklist.sefinek.net/generated/v1/0.0.0.0/phishing/Dogino/Discord-Phishing-URLs-phishing.fork.txt",
+
+  # OpenPhish
+  "https://raw.githubusercontent.com/openphish/public_feed/refs/heads/main/feed.txt",
+
+  # Phishing Army
+  "https://phishing.army/download/phishing_army_blocklist.txt",
   "https://blocklist.sefinek.net/generated/v1/0.0.0.0/phishing/phishing.army/blocklist-extended.fork.txt",
+
+  # Phishing.Database
+  "https://raw.githubusercontent.com/mitchellkrogza/Phishing.Database/master/phishing-domains-ACTIVE.txt",
+
+  # PhishDestroy
+  "https://raw.githubusercontent.com/phishdestroy/destroylist/refs/heads/main/list.txt",
+
+  # PiHole Phishtank
+  "https://raw.githubusercontent.com/Zaczero/pihole-phishtank/main/hosts.txt",
+
+  # RPiList Phishing
   "https://blocklist.sefinek.net/generated/v1/0.0.0.0/phishing/RPiList/Phishing-Angriffe.fork.txt",
+
+  # Sefinek Phishing
+  "https://blocklist.sefinek.net/generated/v1/0.0.0.0/malicious/phishing.txt",
+
+
+# ============================================
+# RANSOMWARE
+# ============================================
+  "https://blocklistproject.github.io/Lists/ransomware.txt",
   "https://blocklist.sefinek.net/generated/v1/0.0.0.0/ransomware/blocklistproject/ransomware.fork.txt",
+
+
+# ============================================
+# CRYPTOJACKING
+# ============================================
+  # BlocklistProject Crypto
+  "https://blocklistproject.github.io/Lists/crypto.txt",
+
+  # Prigent Crypto
   "https://blocklist.sefinek.net/generated/v1/0.0.0.0/crypto/cryptojacking/firebog/Prigent/Crypto.fork.txt",
+
+  # NoCoin
   "https://blocklist.sefinek.net/generated/v1/0.0.0.0/crypto/cryptojacking/hoshsadiq/adblock-nocoin-list.fork.txt",
+
+  # Crypto-streams
   "https://blocklist.sefinek.net/generated/v1/0.0.0.0/crypto/cryptojacking/Snota418/Crypto-streams.fork.txt",
-  "https://blocklist.sefinek.net/generated/v1/0.0.0.0/abuse/blocklistproject/hosts.fork.txt",
-  "https://blocklist.sefinek.net/generated/v1/0.0.0.0/abuse/urlhaus.abuse.ch/hostfile.fork.txt",
-  "https://blocklist.sefinek.net/generated/v1/0.0.0.0/fraud/blocklistproject/hosts.fork.txt",
+
+
+
+# ============================================
+# SCAM / FRAUD / ABUSE
+# ============================================
+  # BlocklistProject – Scam, Fraud, Abuse
+  "https://blocklistproject.github.io/Lists/scam.txt",
+  "https://blocklistproject.github.io/Lists/fraud.txt",
+  "https://blocklistproject.github.io/Lists/abuse.txt", # (if used)
   "https://blocklist.sefinek.net/generated/v1/0.0.0.0/scam/blocklistproject/scam.fork.txt",
+  "https://blocklist.sefinek.net/generated/v1/0.0.0.0/fraud/blocklistproject/hosts.fork.txt",
+  "https://blocklist.sefinek.net/generated/v1/0.0.0.0/abuse/blocklistproject/hosts.fork.txt",
+
+  # Dogino Scam
   "https://blocklist.sefinek.net/generated/v1/0.0.0.0/scam/Dogino/Discord-Phishing-URLs-scam.fork.txt",
+
+  # DurableNapkin Scam
   "https://blocklist.sefinek.net/generated/v1/0.0.0.0/scam/durablenapkin/scamblocklist.fork.txt",
+
+  # JarellLlama Scam
   "https://blocklist.sefinek.net/generated/v1/0.0.0.0/scam/jarelllama/scam.fork.txt",
+
+  # Sefinek Scam
   "https://blocklist.sefinek.net/generated/v1/0.0.0.0/scam/sefinek.hosts.txt",
-  "https://blocklist.sefinek.net/generated/v1/0.0.0.0/useless-websites/jarelllama/parked-domains.fork.txt",
-  "https://blocklist.sefinek.net/generated/v1/0.0.0.0/useless-websites/sefinek.hosts.txt",
-  "https://blocklist.sefinek.net/generated/v1/0.0.0.0/sites/pixiv.txt",
+
+
+# ============================================
+# SUSPICIOUS
+# ============================================
+  # FadeMind
   "https://blocklist.sefinek.net/generated/v1/0.0.0.0/suspicious/FadeMind/add-Risk.fork.txt",
+
+  # Firebog w3kbl
   "https://blocklist.sefinek.net/generated/v1/0.0.0.0/suspicious/firebog/w3kbl.fork.txt",
+
+  # Sefinek Suspicious
   "https://blocklist.sefinek.net/generated/v1/0.0.0.0/suspicious/sefinek.hosts.txt",
-    ]
+
+
+# ============================================
+# SPECIAL / MISC
+# ============================================
+  # Pixiv
+  "https://blocklist.sefinek.net/generated/v1/0.0.0.0/sites/pixiv.txt",
+
+  # Stalkerware (AssoEchap)
+  "https://blocklist.sefinek.net/generated/v1/0.0.0.0/malicious/AssoEchap/stalkerware-indicators.fork.txt",
+]
+
+
+ 
