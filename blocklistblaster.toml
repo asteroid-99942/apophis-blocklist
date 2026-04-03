@@ -5,16 +5,16 @@
 block = [
   # BlocklistProject – Malware
   "https://blocklistproject.github.io/Lists/malware.txt",
-  "https://blocklist.sefinek.net/generated/v1/0.0.0.0/malicious/blocklistproject/malware.fork.txt",
+  "https://raw.githubusercontent.com/blocklistproject/Lists/refs/heads/master/ransomware.txt",
 
-  # DandelionSprout Anti-Malware
-  "https://blocklist.sefinek.net/generated/v1/0.0.0.0/malicious/DandelionSprout-AntiMalwareHosts.fork.txt",
+  #CERT.pl
+  "https://hole.cert.pl/domains/domains.txt",
 
+  #Cyberhost - Malware
+  "https://lists.cyberhost.uk/malware.txt",
+  
   # Disconnect.me Malvertising
   "https://blocklist.sefinek.net/generated/v1/0.0.0.0/malicious/disconnectme/simple-malvertising.fork.txt",
-
-  # HostsVN (bigdargon)
-  "https://blocklist.sefinek.net/generated/v1/0.0.0.0/malicious/bigdargon/hostsVN.fork.txt",
 
   # KADhosts
   "https://raw.githubusercontent.com/FiltersHeroes/KADhosts/master/KADhosts.txt",
@@ -29,13 +29,10 @@ block = [
   "https://blocklist.sefinek.net/generated/v1/0.0.0.0/malicious/reported-by-norton.txt",
 
   # RPiList Malware
-  "https://blocklist.sefinek.net/generated/v1/0.0.0.0/malicious/RPiList/Malware.fork.txt",
+  "https://github.com/RPiList/specials/raw/refs/heads/master/Blocklisten/malware",
 
   # Sefinek Malware
   "https://blocklist.sefinek.net/generated/v1/0.0.0.0/malicious/sefinek.hosts.txt",
-
-  # Spam404 Malware
-  "https://blocklist.sefinek.net/generated/v1/0.0.0.0/malicious/Spam404/main-blacklist.fork.txt",
 
   # Stamparm Maltrail
   "https://raw.githubusercontent.com/stamparm/aux/master/maltrail-malware-domains.txt",
@@ -49,27 +46,21 @@ block = [
   # URLHaus (Abuse.ch)
   "https://urlhaus.abuse.ch/downloads/hostfile/",
 
-  # Misc
-  "https://lists.cyberhost.uk/malware.txt",
+  # Zachladen - Malware
   "https://media.githubusercontent.com/media/zachlagden/Pi-hole-Optimized-Blocklists/refs/heads/main/lists/malicious.txt",
-  "https://hole.cert.pl/domains/domains.txt",
+  
 
 # ============================================
 # PHISHING
 # ============================================
 # BlocklistProject – Phishing
   "https://blocklistproject.github.io/Lists/phishing.txt",
-  "https://blocklist.sefinek.net/generated/v1/0.0.0.0/phishing/blocklistproject/phishing.fork.txt",
-
-  # Dogino Discord Phishing
-  "https://blocklist.sefinek.net/generated/v1/0.0.0.0/phishing/Dogino/Discord-Phishing-URLs-phishing.fork.txt",
-
+  
   # OpenPhish
   "https://raw.githubusercontent.com/openphish/public_feed/refs/heads/main/feed.txt",
 
   # Phishing Army
   "https://phishing.army/download/phishing_army_blocklist.txt",
-  "https://blocklist.sefinek.net/generated/v1/0.0.0.0/phishing/phishing.army/blocklist-extended.fork.txt",
 
   # Phishing.Database
   "https://raw.githubusercontent.com/mitchellkrogza/Phishing.Database/master/phishing-domains-ACTIVE.txt",
@@ -91,7 +82,7 @@ block = [
 # RANSOMWARE
 # ============================================
   "https://blocklistproject.github.io/Lists/ransomware.txt",
-  "https://blocklist.sefinek.net/generated/v1/0.0.0.0/ransomware/blocklistproject/ransomware.fork.txt",
+  
 
 
 # ============================================
@@ -118,18 +109,9 @@ block = [
   "https://blocklistproject.github.io/Lists/scam.txt",
   "https://blocklistproject.github.io/Lists/fraud.txt",
   "https://blocklistproject.github.io/Lists/abuse.txt", # (if used)
-  "https://blocklist.sefinek.net/generated/v1/0.0.0.0/scam/blocklistproject/scam.fork.txt",
-  "https://blocklist.sefinek.net/generated/v1/0.0.0.0/fraud/blocklistproject/hosts.fork.txt",
-  "https://blocklist.sefinek.net/generated/v1/0.0.0.0/abuse/blocklistproject/hosts.fork.txt",
-
-  # Dogino Scam
-  "https://blocklist.sefinek.net/generated/v1/0.0.0.0/scam/Dogino/Discord-Phishing-URLs-scam.fork.txt",
-
+ 
   # DurableNapkin Scam
-  "https://blocklist.sefinek.net/generated/v1/0.0.0.0/scam/durablenapkin/scamblocklist.fork.txt",
-
-  # JarellLlama Scam
-  "https://blocklist.sefinek.net/generated/v1/0.0.0.0/scam/jarelllama/scam.fork.txt",
+  "https://raw.githubusercontent.com/durablenapkin/scamblocklist/master/hosts.txt",
 
   # Sefinek Scam
   "https://blocklist.sefinek.net/generated/v1/0.0.0.0/scam/sefinek.hosts.txt",
@@ -138,9 +120,6 @@ block = [
 # ============================================
 # SUSPICIOUS
 # ============================================
-  # FadeMind
-  "https://blocklist.sefinek.net/generated/v1/0.0.0.0/suspicious/FadeMind/add-Risk.fork.txt",
-
   # Firebog w3kbl
   "https://blocklist.sefinek.net/generated/v1/0.0.0.0/suspicious/firebog/w3kbl.fork.txt",
 
