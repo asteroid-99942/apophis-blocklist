@@ -91,8 +91,6 @@ def normalise_domain(domain: str) -> str | None:
 
 def is_valid_tld(domain: str) -> bool:
     suffix = psl.get_public_suffix(domain)
-    if suffix == domain:
-        return False
     return "." in suffix
 
 
@@ -119,7 +117,7 @@ def extract_domain(line: str) -> str | None:
     if not s:
         return None
 
-    # NEW FORMAT 1: Full URLs
+    # Extract from full URLs
     if s.startswith("http://") or s.startswith("https://"):
         try:
             parsed = urllib.parse.urlparse(s)
@@ -130,41 +128,39 @@ def extract_domain(line: str) -> str | None:
         except Exception:
             return None
 
-    # NEW FORMAT 2: Hosts-style "0.0.0.0 domain"
-    elif s.startswith("0.0.0.0 "):
+    # Extract from hosts format
+    if s.startswith("0.0.0.0 ") or s.startswith("127.0.0.1 "):
         parts = s.split()
         if len(parts) >= 2:
             s = parts[1].strip().lower()
         else:
             return None
 
-    # Existing logic
-    parts = s.split()
-    candidate = parts[0] if len(parts) == 1 else parts[1]
-
-    candidate = normalise_domain(candidate)
-    if not candidate:
-        return None
+    s = s.strip().lower()
 
     # Reject IPs
-    if re.match(r"^\d{1,3}(\.\d{1,3}){3}$", candidate):
+    if re.match(r"^\d{1,3}(\.\d{1,3}){3}$", s):
         return None
-    if ":" in candidate:
+
+    # Reject IPv6
+    if ":" in s:
         return None
 
     # Reject underscores
-    if "_" in candidate:
+    if "_" in s:
         return None
 
-    # Validate structure
-    if not DOMAIN_RE.match(candidate):
+    # Validate domain structure
+    if not DOMAIN_RE.match(s):
         return None
 
     # Validate TLD
-    if not is_valid_tld(candidate):
+    if not is_valid_tld(s):
         return None
 
-    return candidate
+    # Normalise using IDNA
+    s = normalise_domain(s)
+    return s
 
 
 # -----------------------------
@@ -192,16 +188,20 @@ def download_list(url: str, timeout: int = 15, max_retries: int = 5) -> list[str
                 headers["If-Modified-Since"] = cache[url]["last_modified"]
 
         try:
-            resp = requests.get(url, timeout=timeout, headers=headers)
+            resp = requests.get(
+                url,
+                timeout=timeout,
+                headers=headers,
+                allow_redirects=True
+            )
 
             if resp.status_code == 304 and has_cached():
                 log(f"[INFO] Not modified (304): {url}")
                 return cached_lines()
 
             resp.raise_for_status()
-            text = resp.text
+            text = resp.text.lstrip("\ufeff")
 
-            # Validate content
             stripped = text.strip()
             if not stripped:
                 raise ValueError("empty response body")
@@ -212,7 +212,6 @@ def download_list(url: str, timeout: int = 15, max_retries: int = 5) -> list[str
             if lower.startswith("{") or lower.startswith("["):
                 raise ValueError("JSON error page")
 
-            # Save good content
             cache[url] = {
                 "etag": resp.headers.get("ETag"),
                 "last_modified": resp.headers.get("Last-Modified"),
@@ -234,7 +233,6 @@ def download_list(url: str, timeout: int = 15, max_retries: int = 5) -> list[str
             else:
                 log(f"[ERROR] Exhausted retries for {url}")
 
-    # All attempts failed
     if has_cached():
         log(f"[WARN] Using cached content for {url} after repeated failures")
         return cached_lines()
@@ -364,19 +362,14 @@ def main() -> int:
 
     log("[INFO] Starting merge")
 
-    # Blocklist
     block_domains = merge_lists(block_urls, max_workers=args.max_workers)
-
-    # Allowlist
     allow_domains = merge_lists(allow_urls, max_workers=args.max_workers)
 
-    # Apply allowlist
     if allow_domains:
         before = len(block_domains)
         block_domains.difference_update(allow_domains)
         log(f"[INFO] Removed {before - len(block_domains)} domains due to allowlist")
 
-    # Regex list
     regex_entries = set()
     for url in regex_urls:
         try:
@@ -388,17 +381,14 @@ def main() -> int:
         except Exception as e:
             log(f"[WARN] Failed to fetch regex list {url}: {e}")
 
-    # Diff report
     previous = load_previous_blocklist(block_out)
     diff = generate_diff_report(previous, block_domains)
     Path("lists/diff_report.txt").write_text(diff)
 
-    # Save previous for next run
     Path("lists/blocklist_previous.txt").write_text(
         "\n".join(sorted(block_domains))
     )
 
-    # Write outputs
     write_list(block_domains, block_out)
     if allow_domains:
         write_list(allow_domains, allow_out)
