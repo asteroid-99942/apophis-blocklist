@@ -11,7 +11,7 @@ block = [
 
 
 # ============================================
-# MALWARE (CORE)
+# MALWARE (DOMAIN‑ONLY)
 # ============================================
 
   "https://blocklistproject.github.io/Lists/malware.txt",
@@ -19,38 +19,13 @@ block = [
   "https://lists.cyberhost.uk/malware.txt",
   "https://raw.githubusercontent.com/FiltersHeroes/KADhosts/master/KADhosts.txt",
   "https://raw.githubusercontent.com/RPiList/specials/master/Blocklisten/malware",
-  "https://blocklist.sefinek.net/generated/v3/hosts/malicious/sefinek.hosts.txt",
   "https://raw.githubusercontent.com/ShadowWhisperer/BlockLists/master/Lists/Malware",
-  "https://raw.githubusercontent.com/stamparm/aux/master/maltrail-malware-domains.txt",
-  "https://threatfox.abuse.ch/downloads/hostfile",
-  "https://raw.githubusercontent.com/cenk/trcert-malware/main/trcert-domains.txt",
-  "https://urlhaus.abuse.ch/downloads/hostfile/",
   "https://raw.githubusercontent.com/zachlagden/Pi-hole-Optimized-Blocklists/main/lists/malicious.txt",
+  "https://urlhaus.abuse.ch/downloads/hostfile/",
 
 
 # ============================================
-# MALWARE (AGGRESSIVE ADDITIONS)
-# ============================================
-
-  # Botnet C2 feeds
-  "https://raw.githubusercontent.com/stamparm/maltrail/master/tracker.txt",
-  "https://raw.githubusercontent.com/stamparm/maltrail/master/c2.txt",
-
-  # Malware domain blocklist (huge)
-  "https://raw.githubusercontent.com/stamparm/blackbook/master/blackbook.txt",
-
-  # Emerging threats
-  "https://rules.emergingthreats.net/fwrules/emerging-Block-IPs.txt",
-
-  # Abuse.ch C2 Tracker
-  "https://feodotracker.abuse.ch/downloads/hostfile.txt",
-
-  # MalwareDomains.com legacy (still useful)
-  "https://mirror1.malwaredomains.com/files/justdomains",
-
-
-# ============================================
-# PHISHING (CORE)
+# PHISHING (DOMAIN‑ONLY)
 # ============================================
 
   "https://blocklistproject.github.io/Lists/phishing.txt",
@@ -60,70 +35,38 @@ block = [
   "https://raw.githubusercontent.com/phishdestroy/destroylist/main/list.txt",
   "https://raw.githubusercontent.com/Zaczero/pihole-phishtank/main/hosts.txt",
   "https://raw.githubusercontent.com/RPiList/specials/master/Blocklisten/Phishing-Angriffe",
-  "https://blocklist.sefinek.net/generated/v3/hosts/malicious/phishing.txt",
 
 
 # ============================================
-# PHISHING (AGGRESSIVE ADDITIONS)
-# ============================================
-
-  # Anti‑phishing community list
-  "https://raw.githubusercontent.com/mitchellkrogza/Phishing.Database/master/ALL-phishing-domains.txt",
-
-  # Suspicious TLDs (phishing-heavy)
-  "https://raw.githubusercontent.com/ShadowWhisperer/BlockLists/master/Lists/TLD-HighRisk",
-
-
-# ============================================
-# RANSOMWARE
+# RANSOMWARE (DOMAIN‑ONLY)
 # ============================================
 
   "https://blocklistproject.github.io/Lists/ransomware.txt",
-  "https://raw.githubusercontent.com/stamparm/maltrail/master/ransomware.txt",
 
 
 # ============================================
-# SCAM / FRAUD / ABUSE
+# SCAM / FRAUD / ABUSE (DOMAIN‑ONLY)
 # ============================================
 
   "https://blocklistproject.github.io/Lists/scam.txt",
   "https://blocklistproject.github.io/Lists/fraud.txt",
   "https://blocklistproject.github.io/Lists/abuse.txt",
   "https://raw.githubusercontent.com/durablenapkin/scamblocklist/master/hosts.txt",
-  "https://blocklist.sefinek.net/generated/v3/hosts/scam/sefinek.hosts.txt",
 
 
 # ============================================
-# STALKERWARE / SPYWARE / RAT
+# SUSPICIOUS / HIGH‑RISK (DOMAIN‑ONLY)
 # ============================================
 
-  "https://blocklist.sefinek.net/generated/v3/hosts/malicious/AssoEchap/stalkerware-indicators.txt",
-  "https://raw.githubusercontent.com/stamparm/maltrail/master/rat.txt",
-  "https://raw.githubusercontent.com/stamparm/maltrail/master/spyware.txt",
+  # ShadowWhisperer Suspicious (correct path)
+  "https://raw.githubusercontent.com/ShadowWhisperer/BlockLists/master/Lists/SuspiciousDomains",
 
+  # ShadowWhisperer Disposable domains
+  "https://raw.githubusercontent.com/ShadowWhisperer/BlockLists/master/Lists/DisposableDomains",
 
-# ============================================
-# SUSPICIOUS / HIGH-RISK / AGGRESSIVE
-# ============================================
-
-  # Sefinek Suspicious (v3)
-  "https://blocklist.sefinek.net/generated/v3/hosts/suspicious/sefinek.hosts.txt",
-
-  # Firebog w3kbl (v3)
-  "https://blocklist.sefinek.net/generated/v3/hosts/suspicious/firebog/w3kbl.txt",
-
-  # ShadowWhisperer Suspicious
-  "https://raw.githubusercontent.com/ShadowWhisperer/BlockLists/master/Lists/Suspicious",
-
-  # High‑risk disposable domain providers
-  "https://raw.githubusercontent.com/ShadowWhisperer/BlockLists/master/Lists/Disposable",
-
-  # Dynamic DNS abuse
+  # ShadowWhisperer Dynamic DNS abuse
   "https://raw.githubusercontent.com/ShadowWhisperer/BlockLists/master/Lists/DynamicDNS",
 
-  # High‑risk TLDs (aggressive)
-  "https://raw.githubusercontent.com/ShadowWhisperer/BlockLists/master/Lists/TLD-ExtremeRisk",
-
-  # Suspicious newly registered domains (NRDs)
-  "https://raw.githubusercontent.com/stamparm/maltrail/master/nrd.txt",
+  # ShadowWhisperer High‑Risk TLDs (domain‑expanded)
+  "https://raw.githubusercontent.com/ShadowWhisperer/BlockLists/master/Lists/TLD-HighRisk-Domains",
 ]
