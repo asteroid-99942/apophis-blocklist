@@ -36,6 +36,11 @@ jobs:
         run: |
           python3 blocklistblaster.py -c blocklistblaster.toml
 
+      - name: Save merged blocklist
+        run: |
+          mkdir -p output
+          cp lists/blocklist.txt output/hosts.txt
+
       - name: Commit and push changes
         run: |
           git config user.name "github-actions"
@@ -43,6 +48,7 @@ jobs:
 
           if [[ -n "$(git status --porcelain)" ]]; then
             git add lists/*.txt
+            git add output/hosts.txt
             git commit -m "Daily blocklist update: $(date -u +"%Y-%m-%d %H:%M:%S UTC")"
             git push
           else
