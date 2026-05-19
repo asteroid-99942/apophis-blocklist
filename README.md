@@ -7,7 +7,12 @@ It aggregates multiple reputable threat‑intelligence feeds, normalises and val
 
 This project is engineered for reliability, safety, and zero‑regression behaviour — meaning the blocklist will never shrink due to upstream outages or malformed feeds.
 
-While the focus is malware, scams / fraud and phishing third party blocklists may also incorporate advertising which have been previously abused to deliver malware or legitamate services that use computing resources which maybe hijacked to run without a users knowledge. There may also be instances of advertising blocking where a list manager feels the platform is over intrusive on a users privacy. 
+While the focus is malware, scams / fraud and phishing, third party blocklists may also incorporate advertising blocking. These are generally ad programs / hosts which have been previously abused to deliver malware. These can be legitamate services that due to past abuse and potential for future abuse are deemed by list managers to be worth blocking as a precaution. There may also be instances of advertising blocking where a list manager feels the advertising platform is over intrusive on a users privacy. 
+
+At the time of writing the list has over 3 million entries compiled from third party blocklists. A big thank you to all those contributors who share their lists with the community.  
+
+In PiHole ass the following URL to your list manager.
+https://raw.githubusercontent.com/asteroid-99942/apophis-blocklist/main/output/hosts.txt
 
 <br>
 
