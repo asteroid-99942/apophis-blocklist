@@ -11,7 +11,7 @@ While the focus is malware, scams / fraud and phishing, third party blocklists m
 
 At the time of writing the list has over 3 million entries compiled from third party blocklists. A big thank you to all those contributors who share their lists with the community.  
 
-In PiHole ass the following URL to your list manager.
+In PiHole add the following URL to your list manager.
 https://raw.githubusercontent.com/asteroid-99942/apophis-blocklist/main/output/hosts.txt
 
 <br>
