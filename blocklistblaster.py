@@ -31,6 +31,16 @@ DOMAIN_RE = re.compile(
     r"(?:\.(?!-)[A-Za-z0-9-]{1,63}(?<!-))*$"
 )
 
+# NEW: URL + token regexes for enhanced extraction
+URL_RE = re.compile(
+    r"(https?://[A-Za-z0-9\.-]+\.[A-Za-z]{2,63}(?:/[^\s]*)?)",
+    re.IGNORECASE
+)
+
+TOKEN_RE = re.compile(
+    r"[A-Za-z0-9\.-]+\.[A-Za-z]{2,63}"
+)
+
 PSL_PATH = Path("data/public_suffix_list.dat")
 psl = PublicSuffixList(PSL_PATH.read_text().splitlines())
 
@@ -44,18 +54,28 @@ def log(msg: str) -> None:
 
 
 # -----------------------------
-# CACHE HANDLING
+# CACHE HANDLING (FIXED)
 # -----------------------------
 
 def load_cache() -> dict:
-    if CACHE_FILE.exists():
+    """Load cache JSON safely, even if corrupted."""
+    if not CACHE_FILE.exists():
+        return {}
+    try:
         return json.loads(CACHE_FILE.read_text())
-    return {}
+    except json.JSONDecodeError as e:
+        log(f"[WARN] Cache file corrupted ({e}); resetting cache")
+        return {}
+    except Exception as e:
+        log(f"[WARN] Failed to read cache file: {e}")
+        return {}
 
 
 def save_cache(cache: dict) -> None:
     CACHE_FILE.parent.mkdir(parents=True, exist_ok=True)
-    CACHE_FILE.write_text(json.dumps(cache, indent=2))
+    tmp = CACHE_FILE.with_suffix(".tmp")
+    tmp.write_text(json.dumps(cache, indent=2))
+    tmp.replace(CACHE_FILE)
 
 
 def hash_text(text: str) -> str:
@@ -95,7 +115,7 @@ def is_valid_tld(domain: str) -> bool:
 
 
 # -----------------------------
-# DOMAIN EXTRACTION
+# COMMENT CHECK
 # -----------------------------
 
 def is_comment_or_empty(line: str) -> bool:
@@ -103,11 +123,17 @@ def is_comment_or_empty(line: str) -> bool:
     return not s or s.startswith("#") or s.startswith("//") or s.startswith(";")
 
 
-def extract_domain(line: str) -> str | None:
+# -----------------------------
+# **ENHANCED DOMAIN EXTRACTION**
+# -----------------------------
+
+def extract_all_domains(line: str) -> set[str]:
+    """Extract as many valid domains as possible from a single line."""
+    out = set()
     s = line.strip()
 
     if is_comment_or_empty(s):
-        return None
+        return out
 
     # Remove inline comments
     for sep in ("#", ";", "//"):
@@ -115,52 +141,51 @@ def extract_domain(line: str) -> str | None:
             s = s.split(sep, 1)[0].strip()
 
     if not s:
-        return None
+        return out
 
-    # Extract from full URLs
-    if s.startswith("http://") or s.startswith("https://"):
+    # 1. Extract domains from URLs anywhere in the line
+    for url in URL_RE.findall(s):
         try:
-            parsed = urllib.parse.urlparse(s)
-            if parsed.hostname:
-                s = parsed.hostname.lower()
-            else:
-                return None
+            host = urllib.parse.urlparse(url).hostname
+            if host:
+                out.add(host.lower())
         except Exception:
-            return None
+            pass
 
-    # Extract from hosts format
-    if s.startswith("0.0.0.0 ") or s.startswith("127.0.0.1 "):
-        parts = s.split()
-        if len(parts) >= 2:
-            s = parts[1].strip().lower()
-        else:
-            return None
+    # 2. Extract from hosts-format lines
+    parts = s.split()
+    if parts and (parts[0].startswith("0.0.0.0") or parts[0].startswith("127.0.0.1")):
+        parts = parts[1:]
 
-    s = s.strip().lower()
+    # 3. Extract domain-like tokens
+    for token in parts:
+        token = token.strip("[](){}<>,'\"")
 
-    # Reject IPs
-    if re.match(r"^\d{1,3}(\.\d{1,3}){3}$", s):
-        return None
+        if token.startswith("*."):
+            token = token[2:]
 
-    # Reject IPv6
-    if ":" in s:
-        return None
+        if re.match(r"^\d{1,3}(\.\d{1,3}){3}$", token):
+            continue
+        if ":" in token:
+            continue
 
-    # Reject underscores
-    if "_" in s:
-        return None
+        if TOKEN_RE.match(token):
+            out.add(token.lower())
 
-    # Validate domain structure
-    if not DOMAIN_RE.match(s):
-        return None
+    # 4. Validate + normalise
+    final = set()
+    for d in out:
+        if "_" in d:
+            continue
+        if not DOMAIN_RE.match(d):
+            continue
+        if not is_valid_tld(d):
+            continue
+        nd = normalise_domain(d)
+        if nd:
+            final.add(nd)
 
-    # Validate TLD
-    if not is_valid_tld(s):
-        return None
-
-    # Normalise using IDNA
-    s = normalise_domain(s)
-    return s
+    return final
 
 
 # -----------------------------
@@ -241,14 +266,13 @@ def download_list(url: str, timeout: int = 15, max_retries: int = 5) -> list[str
 
 
 # -----------------------------
-# PROCESSING
+# PROCESSING (UPDATED)
 # -----------------------------
 
 def process_lines(lines: list[str]) -> set[str]:
     domains = set()
     for line in lines:
-        d = extract_domain(line)
-        if d:
+        for d in extract_all_domains(line):
             domains.add(d)
     return domains
 
