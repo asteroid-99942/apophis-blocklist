@@ -71,18 +71,19 @@ pip install requests idna publicsuffix2 tomli
 📁 Directory Structure
 Code
 .
-├── blocklistblaster.py
-├── blocklistblaster.toml
-├── data/
-│   └── public_suffix_list.dat
-├── cache/
-│   └── metadata.json   (auto‑generated)
-└── lists/
-    ├── blocklist.txt
-    ├── allowlist.txt
-    ├── regexlist.txt
-    ├── diff_report.txt
-    └── blocklist_previous.txt
+├── blocklistblaster.py <br>
+├── blocklistblaster.toml <br>
+├── data/ <br>
+│   └── public_suffix_list.dat <br>
+├── cache/ <br>
+│   └── metadata.json   (auto‑generated) <br>
+└── lists/ <br>
+    ├── blocklist.txt <br>
+    ├── allowlist.txt <br>
+    ├── regexlist.txt <br>
+    ├── diff_report.txt <br>
+    └── blocklist_previous.txt <br>
+    
 ⚙️ Configuration (TOML)
 Your configuration file (blocklistblaster.toml) controls which lists are merged.
 
@@ -152,7 +153,8 @@ Multiple domains per line
 0.0.0.0 a.com b.net c.org → all three extracted
 
 IDNA / punycode  
-xn--bcher-kva.example → normalised
+xn--bcher-kva.example → normalised 
+<br>
 
 🚀 Running the Script
 ```
