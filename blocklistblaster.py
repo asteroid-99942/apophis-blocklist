@@ -150,7 +150,12 @@ def load_cache() -> dict:
 
 def save_cache(cache: dict) -> None:
     CACHE_FILE.parent.mkdir(parents=True, exist_ok=True)
+
     tmp = CACHE_FILE.with_suffix(".tmp")
+
+    # Ensure the directory exists for the temp file too
+    tmp.parent.mkdir(parents=True, exist_ok=True)
+
     tmp.write_text(json.dumps(cache, indent=2), encoding="utf-8")
     tmp.replace(CACHE_FILE)
 
