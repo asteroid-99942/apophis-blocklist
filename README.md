@@ -170,12 +170,12 @@ python3 blocklistblaster.py --max-workers 16
 ```
 
 📤 Output Files
-File	Description
-lists/blocklist.txt	Final merged blocklist
-lists/allowlist.txt	Combined allowlist
-lists/regexlist.txt	Regex rules from sources
-lists/diff_report.txt	Added/removed domains since last run
-lists/blocklist_previous.txt	Snapshot of previous blocklist
+File	| Description <br>
+lists/blocklist.txt	          | Final merged blocklist <br>
+lists/allowlist.txt	          | Combined allowlist <br>
+lists/regexlist.txt	          | Regex rules from sources <br>
+lists/diff_report.txt	        | Added/removed domains since last run <br>
+lists/blocklist_previous.txt	| Snapshot of previous blocklist <br>
 
 
 🤖 GitHub Actions Integration
